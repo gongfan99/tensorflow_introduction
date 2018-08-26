@@ -1,79 +1,91 @@
-# Simple_thread_pool
-A bare metal thread pool with C++11. It works on both Linux and Windows.
-
-# Build example
-```CPP
-// on Windows with VS 2015 installed
-git clone https://github.com/gongfan99/simple_thread_pool.git
-cd test
-build
-test
-```
+# TensorFlow introduction
+An introduction to artificial neural network with an TensorFlow example.
 
 # Usage
-```CPP
-// Create pool with 3 threads
-ThreadPool pool(3);
-
-// Create threads in the pool and let them run
-pool.start();
-
-// Submit work
-// lambda function is used here as example. Any callable type can be used. But return value has to be void.
-pool.submit( [](float data) { process(data); }, 1.234 );
-
-// Submit work
-// the return value is ignored
-pool.submitFuture( [](float data) -> float { return process(data); }, 1.234 );
-
-// Submit work and get future associated with the result
-auto fut = pool.submitFuture( [](float data) -> float { return process(data); }, 1.234 );
-assert( fut.get() == process(1.234) );
-
-// Shutdown the pool, release all threads
-pool.shutdown();
+First install Anaconda or miniconda.
+Then install TensorFlow as below:
+```cpp
+conda create -n tensorflow pip python=3.6
+activate tensorflow
+conda install -c anaconda tensorflow scipy h5py
 ```
 
-More usage cases can be found in test/test.cc
+Run the example:
+```cpp
+git clone https://github.com/gongfan99/tensorflow_introduction.git
+python example.py
+```
+With epoch=2, we get the accuracy of 98.6% on the test data.
 
-Either `submit()` or `submitFuture()` can be used. `submit()` may be slightly faster but only funtion that returns void can be submitted. `submitFuture()` supports any form of function but may be slower due to the `future` involved.
+# Introduction
+This is a summary of some key concepts of artificial neural network(ANN) which is demonstrated with a TensorFlow example. For how to build an ANN step by step, please check the [reference](https://github.com/gongfan99/tensorflow_introduction#reference).
 
-`submit()` is very good for writing Node native module.
+#### Artificial neural network
+An artificial neural network consists of several layers of neurons. Each neuron connects to other neurons with the weight and bias parameters.
 
-# Further speedup
-If the function to be submitted has a fixed known signature for example `void func(int)`, then the slow `std::bind` can be removed from the `submit()` implementation. `std::bind` is slow because of two reasons: (a) indirect function invoking (b) possible heap allocation if the function argument size is larger than one pointer size.
+#### Neuron
+A neuron is the smallest building block of an ANN with three key features:
+1. state
+This is the input to a neuron. Generally it is a linear sum of the outputs of other neurons.
 
-However, you should not do this unless you are absolutely sure this speedup is needed. It is not in most cases.
+2. activation function
+This is the function that converts the input (i.e. state) of the neuron to the output (i.e. activation). ReLU is a popular and effective choice.
 
-1. First define a class
-```CPP
-class FunctionWrapper {
-  typedef void (*FuncMemberType)(int);
-  FuncMemberType pFunc;
-  int input;
-  FunctionWrapper(FuncMemberType pF, int inp) : pFunc(pF), input(inp) {}
-  void operator()() { pFunc(input); }
-}
+3. activation
+This is the output of the neuron.
+
+#### Multilayer perceptron (MLP)
+MLP is the earliest and most potent architecture of ANN. The neurons of a layer fully connects all the neurons of the next layer.
+```python
+x = keras.layers.Dense(units=128, kernal_initializer='he_uniform', kernal_regularizer=keras.regularizers.l2(l=0.0001), activation='relu')(x)
 ```
 
-2. Modify the `queue` in the `class ThreadPool` to:
-```CPP
-std::queue<FunctionWrapper> queue;
+#### Convolutional layer
+MLP, being very potent due to the full connection between adjacent layers, has large number of weight/bias parameters if a layer has many neurons. For example, if the input to an ANN is a 28 x 28 image, the input layer will have 784 neurons. To decrease the number of the weight/bias parameters and exploit the spatial information in an image, the convolutional layer can be used. Each convolutional layer has several kernels each of which convolutes with the input image to create an output image. Then the output images go through the activation functions to produce the outputs of the layer.
+```python
+x = keras.layers.Conv2D(filters=32, kernel_size=(4, 4), padding='same', kernal_initializer='he_uniform', kernal_regularizer=keras.regularizers.l2(l=0.0001), activation='relu')(inpBatchNorm)
 ```
 
-3. Modify `submit()` to:
-```CPP
-void submit(FuncMemberType pF, int inp) {
-  {
-    std::unique_lock<std::mutex> lock(status_and_queue_mutex);
-    queue.emplace(pF, inp);
-  }
-  status_and_queue_cv.notify_one();
-}
+#### Pooling layer
+The pooling layer consumes small and usually disjoint chunks of the image (typically 2×2) and aggregates them into a single value, thus downsampling the input image. Max-pooling, the most popular approach, simply takes the maximum pixel value within each chunk.
+```python
+x = keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
 ```
+
+#### Regularization
+With large number of weight/bias parameters, an ANN may overfit the potentially noisy training samples, causing decreased accuracy when evaluated with the test samples. Regularization is a technique to avoid overfitting by putting some constraints in the ANN training.
+An easy regularization method is dropout which randomly eliminates the neurons in a layer to prevent any neuron from having overly dominant importance to the entire ANN.
+```python
+x = keras.layers.Dropout(rate=0.25)(x)
+```
+Another regularization method is L2 regularization. It introduces a penalization cost if a weight has large magnitude.
+
+#### Batch and normalization
+Generally an ANN is trained with many batches of training samples. To speedup the training, the batch normalization can be employed to normalize the activation of a layer to zero mean and unit variance across a batch.
+```python
+x = keras.layers.BatchNormalization()(x)
+```
+
+#### Data augmentation
+It is to artificially augment the data with distorted versions during training.
+```python
+datagen = keras.ppreprocessing.image.ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1)
+datagen.fit(x_train[:54000])
+```
+
+#### Ensembles
+The performance of a trained ANN largely depends on the initial conditions. Different initial condition can lead to the ANN with different strength. Therefore, by averaging the outputs from various ANNs trained with different initial conditions, an ANN with balanced strength can be obtained.
+```python
+out = keras.layers.average(outs)
+```
+
+#### Early stopping
+To save time, we can simply stop training once the validation loss has not decreased for a fixed number of epochs (a parameter known as patience).
 
 # Reference
-This implementation is adapted from [Mtrebi's thread pool](https://github.com/mtrebi/thread-pool) which has a very good description of the code.
+[Deep learning for complete beginners: recognising handwritten digits](https://cambridgespark.com/content/tutorials/deep-learning-for-complete-beginners-recognising-handwritten-digits/index.html)
+[Deep learning for complete beginners: convolutional neural networks with keras](https://cambridgespark.com/content/tutorials/convolutional-neural-networks-with-keras/index.html)
+[Deep learning for complete beginners: neural network fine-tuning techniques](https://cambridgespark.com/content/tutorials/neural-networks-tuning-techniques/index.html)
 
 # License
 MIT
