@@ -53,7 +53,7 @@ x = keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
 ```
 
 #### Regularization
-With large number of weight/bias parameters, an ANN may overfit the potentially noisy training samples, causing decreased accuracy when evaluated with the test samples. Regularization is a technique to avoid overfitting by putting some constraints in the ANN training.
+With large number of weight/bias parameters, an ANN may overfit the potentially noisy training samples, causing decreased accuracy when evaluated with the test samples. Regularization is a technique to avoid overfitting by putting some constraints in the ANN training.\
 An easy regularization method is dropout which randomly eliminates the neurons in a layer to prevent any neuron from having overly dominant importance to the entire ANN.
 ```python
 x = keras.layers.Dropout(rate=0.25)(x)
@@ -61,7 +61,7 @@ x = keras.layers.Dropout(rate=0.25)(x)
 Another regularization method is L2 regularization. It introduces a penalization cost if a weight has large magnitude.
 
 #### Batch and normalization
-Generally an ANN is trained with many batches of training samples. To speedup the training, the batch normalization can be employed to normalize the activation of a layer to zero mean and unit variance across a batch.
+Generally an ANN is trained with many batches of training samples. To speedup the training, the batch normalization can be employed to normalize the activations of a layer to zero mean and unit variance across a batch.
 ```python
 x = keras.layers.BatchNormalization()(x)
 ```
@@ -74,7 +74,7 @@ datagen.fit(x_train[:54000])
 ```
 
 #### Ensembles
-The performance of a trained ANN largely depends on the initial conditions. Different initial condition can lead to the ANN with different strength. Therefore, by averaging the outputs from various ANNs trained with different initial conditions, an ANN with balanced strength can be obtained.
+The performance of a trained ANN largely depends on the initial conditions. Different initial condition can lead to the different ANN with strength on certain test samples. Therefore, by averaging the outputs from various ANNs trained with different initial conditions, an ANN with the balanced strength can be obtained.
 ```python
 out = keras.layers.average(outs)
 ```
