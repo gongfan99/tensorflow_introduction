@@ -2,7 +2,7 @@
 An introduction to artificial neural network with an TensorFlow example.
 
 # Usage
-First install Anaconda or miniconda.
+First install Anaconda or miniconda.\
 Then install TensorFlow as below:
 ```cpp
 conda create -n tensorflow pip python=3.6
@@ -25,13 +25,13 @@ An artificial neural network consists of several layers of neurons. Each neuron 
 
 #### Neuron
 A neuron is the smallest building block of an ANN with three key features:
-1. state
+1. state\
 This is the input to a neuron. Generally it is a linear sum of the outputs of other neurons.
 
-2. activation function
+2. activation function\
 This is the function that converts the input (i.e. state) of the neuron to the output (i.e. activation). ReLU is a popular and effective choice.
 
-3. activation
+3. activation\
 This is the output of the neuron.
 
 #### Multilayer perceptron (MLP)
@@ -83,8 +83,8 @@ out = keras.layers.average(outs)
 To save time, we can simply stop training once the validation loss has not decreased for a fixed number of epochs (a parameter known as patience).
 
 # Reference
-[Deep learning for complete beginners: recognising handwritten digits](https://cambridgespark.com/content/tutorials/deep-learning-for-complete-beginners-recognising-handwritten-digits/index.html)
-[Deep learning for complete beginners: convolutional neural networks with keras](https://cambridgespark.com/content/tutorials/convolutional-neural-networks-with-keras/index.html)
+[Deep learning for complete beginners: recognising handwritten digits](https://cambridgespark.com/content/tutorials/deep-learning-for-complete-beginners-recognising-handwritten-digits/index.html)\
+[Deep learning for complete beginners: convolutional neural networks with keras](https://cambridgespark.com/content/tutorials/convolutional-neural-networks-with-keras/index.html)\
 [Deep learning for complete beginners: neural network fine-tuning techniques](https://cambridgespark.com/content/tutorials/neural-networks-tuning-techniques/index.html)
 
 # License
