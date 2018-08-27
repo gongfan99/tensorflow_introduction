@@ -1,5 +1,5 @@
 # TensorFlow introduction
-An introduction to artificial neural network with an TensorFlow example.
+An introduction to artificial neural network with a TensorFlow example.
 
 # Usage
 First install Anaconda or miniconda.\
