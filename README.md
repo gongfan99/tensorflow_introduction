@@ -69,7 +69,7 @@ x = keras.layers.BatchNormalization()(x)
 #### Data augmentation
 It is to artificially augment the data with distorted versions during training.
 ```python
-datagen = keras.ppreprocessing.image.ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1)
+datagen = keras.preprocessing.image.ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1)
 datagen.fit(x_train[:54000])
 ```
 
